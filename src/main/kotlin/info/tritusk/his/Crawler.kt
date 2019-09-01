@@ -35,6 +35,7 @@ class Crawler(private val dbClient : Jedis) : Runnable {
                     LOGGER.warn(MARKER, "Failed to write database")
                 }
             }
+            Thread.sleep(10000)
         }
     }
 
