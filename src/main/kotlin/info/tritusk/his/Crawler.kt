@@ -29,10 +29,15 @@ class Crawler(private val dbClient : Jedis) : Runnable {
         while (running) {
             val currentTime = System.currentTimeMillis() / 600000
             if (currentTime - lastTime > 0) {
-                lastTime = currentTime
-                val result = dbClient.hmset(currentTime.toString(), this.retrieve())
+                val result = try {
+                    dbClient.hmset(currentTime.toString(), this.retrieve())
+                } catch (e: Exception) {
+                    continue
+                }
                 if (result != "OK") {
                     LOGGER.warn(MARKER, "Failed to write database")
+                } else {
+                    lastTime = currentTime
                 }
             }
             Thread.sleep(10000)

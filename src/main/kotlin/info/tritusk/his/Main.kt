@@ -10,7 +10,7 @@ import redis.clients.jedis.Jedis
 val LOGGER: Logger = LoggerFactory.getLogger("HiS")
 val MARKER: Marker = MarkerFactory.getMarker("Main")
 
-fun main(args: Array<String>) {
+fun main(vararg args: String) {
 
     val parser = OptionParser().also {
         it.allowsUnrecognizedOptions()

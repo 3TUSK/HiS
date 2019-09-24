@@ -13,7 +13,7 @@ import com.iyanuadelekan.kanary.server.Server
 import org.eclipse.jetty.server.Request
 import redis.clients.jedis.Jedis
 import java.time.Instant
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -62,7 +62,7 @@ class Frontend(private val dbClient : Jedis) {
                 <br/>
                 The ratio of repost thread to original threads is $ratio.
                 <br/>
-                Latest data are harvested at ${Instant.ofEpochMilli(timestamp * 600000).atZone(ZoneId.of("UTC")).format(DateTimeFormatter.RFC_1123_DATE_TIME)}
+                Latest data are harvested at ${Instant.ofEpochMilli(timestamp * 600000).atZone(ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME)}
                 </section>
                 <footer>
                 Site powered by <a href=https://github.com/xetorthio/jedis>Jedis</a>, <a href=https://jsoup.org/>Jsoup</a>, <a href=https://seunadelekan.github.io/Kanary>Kanary</a> and their dependencies
