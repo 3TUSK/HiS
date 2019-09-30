@@ -1,39 +1,30 @@
 package info.tritusk.his
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.iyanuadelekan.kanary.app.KanaryApp
-import com.iyanuadelekan.kanary.core.KanaryController
-import com.iyanuadelekan.kanary.core.KanaryRouter
-import com.iyanuadelekan.kanary.handlers.AppHandler
-import com.iyanuadelekan.kanary.helpers.http.request.*
-import com.iyanuadelekan.kanary.helpers.http.response.*
-import com.iyanuadelekan.kanary.middleware.*
-import com.iyanuadelekan.kanary.server.Server
-import org.eclipse.jetty.server.Request
+import io.javalin.Javalin
 import redis.clients.jedis.Jedis
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 class Frontend(private val dbClient : Jedis) {
 
     fun start(port: Int) {
-        Server().apply {
-            this.handler = AppHandler(KanaryApp().apply {
-                this.mount(KanaryRouter().apply {
-                    this on "his/" use KanaryController()
-                    this.get("display/", ::display)
-                    this.get("json/", ::sendJson)
-                })
-                this.use(simpleConsoleRequestLogger)
-            })
-        }.listen(port)
+        Javalin.create().start(port).apply {
+            this.get("his/") { ctx ->
+                ctx.status(200).html(display())
+            }
+            this.get("his/json") { ctx ->
+                val timestamp = try {
+                    ctx.queryParam("time")?.toLong() ?: System.currentTimeMillis()
+                } catch (e: Exception) {
+                    System.currentTimeMillis()
+                } / 600000
+                ctx.status(200).json(this@Frontend.dbClient.hgetAll(timestamp.toString()))
+            }
+        }
     }
 
-    private fun display(baseReq: Request, req: HttpServletRequest, res: HttpServletResponse) {
+    private fun display(): String {
         val timestamp = System.currentTimeMillis() / 600000
         val data = try {
             this.dbClient.hgetAll(timestamp.toString())
@@ -47,7 +38,8 @@ class Frontend(private val dbClient : Jedis) {
         } catch (e: Exception) {
             -1.0
         }
-        res withStatus 200 sendHtml """
+        return """
+                <!DOCTYPE html>
                 <head>
                 <meta charset="utf-8"/>
                 <title>HiS: The ratio counter</title>
@@ -65,25 +57,13 @@ class Frontend(private val dbClient : Jedis) {
                 Latest data are harvested at ${Instant.ofEpochMilli(timestamp * 600000).atZone(ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME)}
                 </section>
                 <footer>
-                Site powered by <a href=https://github.com/xetorthio/jedis>Jedis</a>, <a href=https://jsoup.org/>Jsoup</a>, <a href=https://seunadelekan.github.io/Kanary>Kanary</a> and their dependencies
+                Site powered by <a href=https://github.com/FasterXML/jackson-databind>Jackson-databind</a>, <a href=https://javalin.io/>Javalin</a>, <a href=https://github.com/xetorthio/jedis>Jedis</a>, <a href=https://jsoup.org/>Jsoup</a> and their dependencies
                 <br/>
                 Theme powered by <a href=https://github.com/mblode/marx>mblode/marx</a>
                 </footer>
                 </main>
                 </body>
             """.trimIndent()
-        baseReq.done()
-    }
-
-    private fun sendJson(baseReq: Request, req: HttpServletRequest, res: HttpServletResponse) {
-        val timestamp = System.currentTimeMillis() / 600000
-        if (this.dbClient.exists(timestamp.toString())) {
-            val data = this.dbClient.hgetAll(timestamp.toString())
-            res withStatus 200 sendJson ObjectMapper().valueToTree(data)
-        } else {
-            res withStatus 200 sendJson JsonNodeFactory.instance.objectNode()
-        }
-        baseReq.done()
     }
 
 }

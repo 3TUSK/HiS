@@ -7,7 +7,7 @@ repositories {
     jcenter()
 }
 
-version = "0.1.2"
+version = "0.2.0"
 
 dependencies {
     // kotlin runtime
@@ -16,10 +16,12 @@ dependencies {
     compile(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.3.41")
     compile(group = "org.jetbrains", name = "annotations", version = "17.0.0")
 
+    // jackson, for parsing json
+    compile(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.0")
     // jsoup, for parsing HTML
     compile(group = "org.jsoup", name = "jsoup", version = "1.12.1")
-    // kanary, for wrapping servlet and serving content
-    compile(group = "com.iyanuadelekan", name = "kanary", version = "0.9.2")
+    // javalin, for wrapping servlet and serving content
+    compile(group = "io.javalin", name = "javalin", version = "3.5.0")
     // jedis, for bridging redis.
     compile(group = "redis.clients", name = "jedis", version = "3.1.0")
     // jopt-simple, for parsing cli arguments
