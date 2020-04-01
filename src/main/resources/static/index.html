@@ -4,12 +4,12 @@
     <title>HiS: The ratio counter</title>
     <link rel="stylesheet" href="https://unpkg.com/marx-css/css/marx.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style> h1 { text-align: center; } </style>
 </head>
 <body>
 <main id="app">
     <div v-if="loaded">
-        <!-- TODO Remove the usage of center tag -->
-        <center><h1>Historia in Speculō</h1></center>
+        <h1>Historia in Speculō</h1>
         <hr/>
         <section>
             At this moment, there are {{ repost }} mod repost threads and {{ original }} original mod release threads on mcbbs.net.
@@ -17,6 +17,10 @@
             The ratio of repost thread to original threads is {{ ratio }}.
             <br/>
             Latest data are harvested at {{ timestamp }}.
+        </section>
+        <hr/>
+        <section>
+            <a href=https://www.mcbbs.net/forum.php?mod=forumdisplay&fid=45&filter=author&orderby=dateline&typeid=294>Jump to original mod release page on mcbbs.net</a>
         </section>
     </div>
     <div v-else>
