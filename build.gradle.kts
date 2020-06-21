@@ -1,13 +1,15 @@
 plugins {
     java
     kotlin("jvm") version "1.3.41"
+    id("org.ajoberstar.grgit") version "4.0.2"
+    id("com.palantir.docker") version "0.25.0"
 }
 
 repositories {
     jcenter()
 }
 
-version = "0.4.0"
+version = "0.4.0+" + grgit.head().abbreviatedId
 
 dependencies {
     // kotlin runtime
@@ -43,4 +45,14 @@ tasks.register<Jar>("shadeJar") {
 
 artifacts {
     add("archives", tasks["shadeJar"])
+}
+
+docker {
+    dependsOn(tasks["shadeJar"])
+
+    name = "historia-in-speculo:${version}"
+    // kotlin property setter refuse to work here
+    setDockerfile(file("Dockerfile"))
+    files(tasks["shadeJar"].outputs)
+    buildArgs(mapOf("VERSION" to version.toString()))
 }
