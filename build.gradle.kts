@@ -36,7 +36,8 @@ tasks.register<Jar>("shadeJar") {
     dependsOn(":jar")
     classifier = "shaded"
     from(sourceSets["main"].output)
-    from(configurations.compile.map {
+    // https://github.com/gradle/kotlin-dsl-samples/issues/1082
+    from(configurations["compile"].map {
         if (it.isDirectory) it else zipTree(it).matching {
             exclude("META-INF/", "*.class", "*.css", "*.html")
         }
