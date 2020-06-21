@@ -1,9 +1,9 @@
 package info.tritusk.his
 
 import io.javalin.Javalin
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisPool
 
-class Frontend(private val dbClient : Jedis) {
+class Frontend(private val pool : JedisPool) {
 
     fun start(port: Int) {
         Javalin.create { config ->
@@ -18,14 +18,12 @@ class Frontend(private val dbClient : Jedis) {
                 } / 600000
                 ctx.status(500).json(mapOf("error" to "Failed to query data"))
                 try {
-                    synchronized(this@Frontend.dbClient) {
-                        // TODO: This is definitely wrong, need to look deeper
-                        ctx.json(this@Frontend.dbClient.hgetAll(timestamp.toString()))
+                    this@Frontend.pool.resource.use {
+                        ctx.json(it.hgetAll(timestamp.toString()))
+                        ctx.status(200)
                     }
-                    ctx.status(200)
                 } catch (e: Exception) {
-                    System.err.println("An error occurred while querying database. Details: ")
-                    System.err.println(e.localizedMessage)
+                    LOGGER.error("An error occurred while querying database. Details: ", e)
                 }
             }
         }

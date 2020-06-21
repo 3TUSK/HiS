@@ -5,7 +5,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisPool
+import redis.clients.jedis.JedisPoolConfig
 
 val LOGGER: Logger = LoggerFactory.getLogger("HiS")
 val MARKER: Marker = MarkerFactory.getMarker("Main")
@@ -27,28 +28,20 @@ fun main(vararg args: String) {
         return
     }
 
-    val dbClient = Jedis(options.valueOf(dbAddress), options.valueOf(dbPort))
-    dbClient.ping()
-    if (!dbClient.isConnected) {
-        LOGGER.info(MARKER, "HiS cannot connect to Redis database on ${options.valueOf(dbAddress)}:${options.valueOf(dbPort)}")
-        LOGGER.info(MARKER, "HiS is shutting down")
-        try {
-            dbClient.quit()
-        } catch (ignored: Exception) {}
-        return
-    }
+    val pool = JedisPool(JedisPoolConfig(), options.valueOf(dbAddress), options.valueOf(dbPort))
 
     LOGGER.info(MARKER, "Starting crawler...")
 
-    val crawler = Crawler(dbClient)
+    val crawler = Crawler(pool)
     val crawlerRunner = Thread(crawler).apply { this.start() }
     Runtime.getRuntime().addShutdownHook(Thread {
         crawler.running = false
         LOGGER.info(MARKER, "Shutting down crawler...")
         crawlerRunner.join()
+        pool.close()
     })
 
     LOGGER.info(MARKER, "Starting web server...")
 
-    Frontend(dbClient).start(options.valueOf(serverPort))
+    Frontend(pool).start(options.valueOf(serverPort))
 }

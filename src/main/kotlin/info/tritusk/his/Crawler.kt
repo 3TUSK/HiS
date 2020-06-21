@@ -3,9 +3,9 @@ package info.tritusk.his
 import org.jsoup.Jsoup
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisPool
 
-class Crawler(private val dbClient : Jedis) : Runnable {
+class Crawler(private val pool : JedisPool) : Runnable {
 
     companion object {
         val MARKER: Marker = MarkerFactory.getMarker("Crawler")
@@ -29,15 +29,16 @@ class Crawler(private val dbClient : Jedis) : Runnable {
         while (running) {
             val currentTime = System.currentTimeMillis() / 600000
             if (currentTime - lastTime > 0) {
-                val result = try {
-                    dbClient.hmset(currentTime.toString(), this.retrieve())
-                } catch (e: Exception) {
-                    continue
-                }
-                if (result != "OK") {
-                    LOGGER.warn(MARKER, "Failed to write database")
-                } else {
-                    lastTime = currentTime
+                try {
+                    pool.resource.use {
+                        if (it.hmset(currentTime.toString(), this.retrieve()) == "OK") {
+                            lastTime = currentTime
+                        } else {
+                            LOGGER.warn(MARKER, "Failed to write database")
+                        }
+                    }
+                } catch(e: Exception) {
+                    LOGGER.error(MARKER, "Error occurred while retrieving latest data. ", e)
                 }
             }
             Thread.sleep(10000)
