@@ -1,5 +1,4 @@
 plugins {
-    java
     kotlin("jvm") version "1.3.41"
     id("org.ajoberstar.grgit") version "4.0.2"
     id("com.palantir.docker") version "0.25.0"
