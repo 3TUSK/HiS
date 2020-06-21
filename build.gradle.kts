@@ -51,7 +51,9 @@ artifacts {
 docker {
     dependsOn(tasks["shadeJar"])
 
-    name = "historia-in-speculo:${version}"
+    // We use SemVer, but a valid docker tag only allows letters, digits,
+    // underscores and hyphens. We replace the plus sign with hyphen here.
+    name = "historia-in-speculo:${version.toString().replace('+', '-')}"
     // kotlin property setter refuse to work here
     setDockerfile(file("Dockerfile"))
     files(tasks["shadeJar"].outputs)
