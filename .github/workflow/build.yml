@@ -1,0 +1,9 @@
+name: build-image
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Gradle build"
+        run: gradle docker
