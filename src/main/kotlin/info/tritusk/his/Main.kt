@@ -18,7 +18,7 @@ fun main(vararg args: String) {
         it.accepts("help", "Print this").forHelp()
     }
     val dbAddress = parser.accepts("db-address").withRequiredArg().defaultsTo("localhost")
-    val dbPort = parser.accepts("db-port").withRequiredArg().ofType(Int::class.java).defaultsTo(7379)
+    val dbPort = parser.accepts("db-port").withRequiredArg().ofType(Int::class.java).defaultsTo(6379)
     val serverPort = parser.accepts("server-port").withRequiredArg().ofType(Int::class.java).defaultsTo(8080)
 
     val options = parser.parse(*args)
