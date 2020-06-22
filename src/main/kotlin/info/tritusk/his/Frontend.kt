@@ -5,6 +5,8 @@ import redis.clients.jedis.JedisPool
 
 class Frontend(private val pool : JedisPool) {
 
+    private val errorPayload = mapOf("error" to "Failed to query data")
+
     fun start(port: Int) {
         Javalin.create { config ->
             config.showJavalinBanner = false
@@ -16,14 +18,13 @@ class Frontend(private val pool : JedisPool) {
                 } catch (e: Exception) {
                     System.currentTimeMillis()
                 } / 600000
-                ctx.status(500).json(mapOf("error" to "Failed to query data"))
                 try {
                     this@Frontend.pool.resource.use {
-                        ctx.json(it.hgetAll(timestamp.toString()))
-                        ctx.status(200)
+                        ctx.status(200).json(it.hgetAll(timestamp.toString()))
                     }
                 } catch (e: Exception) {
                     LOGGER.error("An error occurred while querying database. Details: ", e)
+                    ctx.status(500).json(errorPayload)
                 }
             }
         }

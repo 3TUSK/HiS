@@ -8,7 +8,7 @@ repositories {
     jcenter()
 }
 
-version = "0.4.0"
+version = "0.5.0"
 
 dependencies {
     // kotlin runtime
@@ -55,9 +55,9 @@ docker {
         tagBase = "${System.getenv("DOCKER_REGISTRY")}/$tagBase"
     }
 
-    name = "$tagBase:$version"
-    tag("bleeding", "$tagBase:latest")
-    tag("archive", "$name-${grgit.head().abbreviatedId}")
+    name = "$tagBase:latest"
+    tag("staging", "$tagBase:$version")
+    tag("archive", "$tagBase:$version-${grgit.head().abbreviatedId}")
     // kotlin property setter refuse to work here
     setDockerfile(file("Dockerfile"))
     files(tasks["shadeJar"].outputs)
