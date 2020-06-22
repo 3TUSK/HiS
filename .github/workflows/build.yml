@@ -15,5 +15,5 @@ jobs:
         env:
           DOCKER_PUSH: true
           DOCKER_REGISTRY: ${{ secrets.REGISTRY }}
-        run: gradle docker dockerPush
+        run: gradle docker dockerTag dockerPush
 

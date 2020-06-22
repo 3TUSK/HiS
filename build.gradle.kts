@@ -50,10 +50,14 @@ artifacts {
 docker {
     dependsOn(tasks["shadeJar"])
 
-    name = "3tusk/historia-in-speculo:$version-${grgit.head().abbreviatedId}"
+    var tagBase = "3tusk/historia-in-speculo"
     if ("DOCKER_REGISTRY" in System.getenv()) {
-        name = "${System.getenv("DOCKER_REGISTRY")}/$name"
+        tagBase = "${System.getenv("DOCKER_REGISTRY")}/$tagBase"
     }
+
+    name = "$tagBase:$version"
+    tag("bleeding", "$tagBase:latest")
+    tag("archive", "$name-${grgit.head().abbreviatedId}")
     // kotlin property setter refuse to work here
     setDockerfile(file("Dockerfile"))
     files(tasks["shadeJar"].outputs)
