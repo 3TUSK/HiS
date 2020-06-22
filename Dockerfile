@@ -12,6 +12,4 @@ EXPOSE 8080
 ENV REDIS_ADDR localhost
 ENV REDIS_PORT 6379
 
-ENTRYPOINT [ "sh", "-c", "java", "-cp", "HiS.jar", "info.tritusk.his.MainKt" ]
-
-CMD [ "--db-address", "$REDIS_ADDR", "--db-port", "$REDIS_PORT" ]
+CMD java -cp HiS.jar info.tritusk.his.MainKt --db-address $REDIS_ADDR --db-port $REDIS_PORT
