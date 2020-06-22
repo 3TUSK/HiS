@@ -8,7 +8,7 @@ repositories {
     jcenter()
 }
 
-version = "0.4.0+" + grgit.head().abbreviatedId
+version = "0.4.0"
 
 dependencies {
     // kotlin runtime
@@ -50,11 +50,18 @@ artifacts {
 docker {
     dependsOn(tasks["shadeJar"])
 
-    // We use SemVer, but a valid docker tag only allows letters, digits,
-    // underscores and hyphens. We replace the plus sign with hyphen here.
-    name = "historia-in-speculo:${version.toString().replace('+', '-')}"
+    name = "3tusk/historia-in-speculo:$version-${grgit.head().abbreviatedId}"
+    if ("DOCKER_REGISTRY" in System.getenv()) {
+        name = "${System.getenv("DOCKER_REGISTRY")}/$name"
+    }
     // kotlin property setter refuse to work here
     setDockerfile(file("Dockerfile"))
     files(tasks["shadeJar"].outputs)
-    buildArgs(mapOf("VERSION" to version.toString()))
+    buildArgs(mapOf("VERSION" to "$version"))
+}
+
+tasks.getByName("dockerPush") {
+    onlyIf {
+        "DOCKER_PUSH" in System.getenv()
+    }
 }

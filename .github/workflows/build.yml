@@ -5,5 +5,15 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - name: "Docker login"
+        env:
+          DOCKER_REGISTRY: ${{ secrets.REGISTRY }}
+          DOCKER_USERNAME: ${{ secrets.USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.PASSWORD }}
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY
       - name: "Gradle build"
-        run: gradle docker
+        env:
+          DOCKER_PUSH: true
+          DOCKER_REGISTRY: ${{ secrets.REGISTRY }}
+        run: gradle docker dockerPush
+
