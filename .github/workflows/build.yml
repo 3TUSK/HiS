@@ -4,6 +4,7 @@ on:
     paths:
     - "src/**"
     - "build.gradle.kts"
+    - "settings.gradle.kts"
 jobs:
   build:
     runs-on: ubuntu-18.04
