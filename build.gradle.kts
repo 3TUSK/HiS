@@ -5,7 +5,7 @@ plugins {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 version = "0.5.0"
@@ -29,6 +29,11 @@ dependencies {
     compile(group = "net.sf.jopt-simple", name = "jopt-simple", version = "6.0-alpha-3")
     // slf4j, with java.util.logging binding
     compile(group = "org.slf4j", name = "slf4j-jdk14", version = "1.7.27")
+
+    // jOOQ, for interacting with SQL
+    // compile(group = "org.jooq", name = "jooq", version = "3.13.2")
+    // PostgreSQL JDBC, to connect to SQL
+    // implementation(group = "org.postgresql", name = "postgresql", version = "42.2.14")
 }
 
 tasks.register<Jar>("shadeJar") {
