@@ -1,9 +1,10 @@
 pluginManagement {
     repositories {
-        //gradlePluginPortal()
+        //gradlePluginPortal() 
+        // Used for GrGit. We can use JGit directly, but it is cumbersome.
         maven {
             name = "ajoberstar-backup"
-            url = "https://ajoberstar.github.io/bintray-backup/"
+            url = uri("https://ajoberstar.github.io/bintray-backup/")
         }
     }
 }
